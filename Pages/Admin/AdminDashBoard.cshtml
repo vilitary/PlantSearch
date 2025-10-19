@@ -1,0 +1,108 @@
+@page
+@model PlantSearch.Pages.Admin.AdminDashBoardModel
+@{
+    Layout = "~/Pages/Shared/_Adminlayout.cshtml";
+    ViewData["Title"] = "Thống kê hệ thống";
+}
+
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<link rel="stylesheet" href="~/css/AdminDashboard.css?v1.1" />
+
+<div class="container-dashboard">
+    <h2 class="text-center mb-4">Dashboard hệ thống</h2>
+
+    <!-- Hai card nằm ngang -->
+    <div class="cards-row">
+        <!-- Top 3 cây -->
+        <div class="card">
+            <h4><i class="fas fa-star"></i> Top 3 cây đánh giá cao</h4>
+            <table class="table-topplants">
+                <thead>
+                    <tr>
+                        <th>STT</th>
+                        <th>Tên cây</th>
+                        <th>Điểm TB</th>
+                        <th>Lượt đánh giá</th>
+                        <th>Sao</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @for (int i = 0; i < Model.TopPlants.Count; i++)
+                    {
+                        var plant = Model.TopPlants[i];
+                        <tr>
+                            <td>@(i+1)</td>
+                            <td>@plant.PlantName</td>
+                            <td>@plant.AverageRating.ToString("0.0")</td>
+                            <td>@plant.RatingCount</td>
+                            <td>
+                                @for (int star = 1; star <= 5; star++)
+                                {
+                                    if (star <= Math.Floor(plant.AverageRating))
+                                    {
+                                        <i class="bi bi-star-fill text-warning"></i>
+                                    }
+                                    else if (star - plant.AverageRating <= 0.5 && star > plant.AverageRating)
+                                    {
+                                        <i class="bi bi-star-half text-warning"></i>
+                                    }
+                                    else
+                                    {
+                                        <i class="bi bi-star text-secondary"></i>
+                                    }
+                                }
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Biểu đồ cây theo tháng -->
+        <div class="card">
+            <h4><i class="fas fa-chart-bar"></i> Biểu đồ cây theo tháng</h4>
+            <div class="chart-container">
+                <canvas id="plantChart" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Nút hành động -->
+    <div class="action-buttons">
+        <a href="/Admin/Plants" class="btn-manage"><i class="fas fa-leaf"></i> Quản lý cây</a>
+        <a href="/Admin/Report" class="btn-report"><i class="fas fa-file-export"></i> Xuất báo cáo</a>
+    </div>
+</div>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+<script>
+    const ctx = document.getElementById('plantChart').getContext('2d');
+    const plantChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MonthLabels)),
+            datasets: [{
+                label: 'Số cây trồng',
+                data: @Html.Raw(System.Text.Json.JsonSerializer.Serialize(Model.MonthlyPlantCounts)),
+                backgroundColor: '#66bb6a',
+                borderRadius: 5
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: { display: false }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 1 }
+                }
+            }
+        }
+    });
+</script>
+
+<!-- Chèn icon bootstrap cho sao -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">

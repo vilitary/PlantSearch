@@ -1,0 +1,188 @@
+@page "{id:int}"
+@model EditPlantModel
+@using PlantSearch.Models
+@{
+    Layout = "~/Pages/Shared/_Adminlayout.cshtml";
+    ViewData["Title"] = "EditPlant";
+}
+<link rel="stylesheet" href="~/css/EditPlant.css?v=1.1" />
+
+
+<div class="container-fluid px-5 mt-4">
+    <div class="card shadow-sm border-0">
+        <div class="card-header bg-success text-white">
+            <h4 class="mb-0">🛠️ Sửa thông tin cây trồng</h4>
+        </div>
+        <div class="card-body">
+            <form method="POST">
+                <div class="row gx-5 gy-4">
+                    <!-- Thông tin cơ bản -->
+                    <div class="entity-box col-12">
+                        <h5 class="entity-title">🌿 Thông tin cơ bản</h5>
+                        <div class="row gy-3">
+                            <div class="col-md-6">
+                                <label asp-for="Plant.PlantName" class="form-label">Tên cây</label>
+                                <input asp-for="Plant.PlantName" class="form-control" />
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Plant.ScienceName" class="form-label">Tên khoa học</label>
+                                <input asp-for="Plant.ScienceName" class="form-control" />
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Plant.Origin" class="form-label">Nguồn gốc</label>
+                                <input asp-for="Plant.Origin" class="form-control" />
+                            </div>
+                            <div class="col-md-6">
+                                <label asp-for="Plant.GrowthDuration" class="form-label">Thời gian sinh trưởng (ngày)</label>
+                                <input asp-for="Plant.GrowthDuration" class="form-control" type="number" />
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Ảnh đại diện (URL hoặc tên file)</label>
+                                <input asp-for="NewImageUrl" class="form-control" />
+                                @{
+                                    var images = Model.Plant.Plantimages?.OfType<Plantimage>().ToList();
+                                }
+                                @if (images != null && images.Any())
+                                {
+                                    <div class="mt-2">
+                                        <label class="form-label">Ảnh hiện tại:</label><br />
+                                        <img src="@images.FirstOrDefault()?.ImageUrl" class="img-thumbnail" style="height: 120px;" />
+                                    </div>
+                                }
+                            </div>
+                            <div class="col-md-12">
+                                <label asp-for="Plant.Description" class="form-label">Mô tả</label>
+                                <textarea asp-for="Plant.Description" class="form-control" rows="4"></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Phương pháp canh tác -->
+                    <div class="entity-box col-12">
+                        <h5 class="entity-title">🌾 Phương pháp canh tác</h5>
+                        <div class="d-flex flex-wrap gap-3">
+                            @foreach (CultivationMethod method in Model.AllMethods)
+                            {
+                                var methodList = Model.Plant.Methods?.OfType<CultivationMethod>().ToList();
+                                bool isChecked = methodList != null && methodList.Any(m => m.Id == method.Id);
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="SelectedMethodIds"
+                                           value="@method.Id" @(isChecked ? "checked" : "") />
+                                    <label class="form-check-label">@method.MethodName</label>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Bệnh thường gặp -->
+                    <div class="entity-box col-12">
+                        <h5 class="entity-title">🦠 Bệnh thường gặp</h5>
+                        <div class="d-flex flex-wrap gap-3">
+                            @foreach (DiseaseType disease in Model.AllDiseases)
+                            {
+                                var diseaseList = Model.Plant.Diseases?.OfType<DiseaseType>().ToList();
+                                bool isChecked = diseaseList != null && diseaseList.Any(d => d.Id == disease.Id);
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="SelectedDiseaseIds"
+                                           value="@disease.Id" @(isChecked ? "checked" : "") />
+                                    <label class="form-check-label">@disease.DiseaseName</label>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Phân bón phù hợp -->
+                    <div class="entity-box col-12">
+                        <h5 class="entity-title">🧪 Phân bón phù hợp</h5>
+                        <div class="d-flex flex-wrap gap-3">
+                            @foreach (FertilizerType fertilizer in Model.AllFertilizers)
+                            {
+                                var fertList = Model.Plant.Fertilizers?.OfType<FertilizerType>().ToList();
+                                bool isChecked = fertList != null && fertList.Any(f => f.Id == fertilizer.Id);
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="SelectedFertilizerIds"
+                                           value="@fertilizer.Id" @(isChecked ? "checked" : "") />
+                                    <label class="form-check-label">@fertilizer.TypeName</label>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Vùng trồng phù hợp -->
+                    <div class="entity-box col-12">
+                        <h5 class="entity-title">🗺️ Vùng trồng phù hợp</h5>
+                        <div class="d-flex flex-wrap gap-3">
+                            @foreach (SuitableRegion region in Model.Regions)
+                            {
+                                var regionList = Model.Plant.Regions?.OfType<SuitableRegion>().ToList();
+                                bool isChecked = regionList != null && regionList.Any(r => r.Id == region.Id);
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="SelectedRegionIds"
+                                           value="@region.Id" @(isChecked ? "checked" : "") />
+                                    <label class="form-check-label">@region.RegionName</label>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Mùa vụ -->
+                    <div class="entity-box col-12">
+                        <h5 class="entity-title">🌤️ Mùa vụ</h5>
+                        <div class="d-flex flex-wrap gap-3">
+                            @foreach (Season season in Model.Seasons)
+                            {
+                                var seasonList = Model.Plant.Seasons?.OfType<Season>().ToList();
+                                bool isChecked = seasonList != null && seasonList.Any(s => s.Id == season.Id);
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="SelectedSeasonIds"
+                                           value="@season.Id" @(isChecked ? "checked" : "") />
+                                    <label class="form-check-label">@season.SeasonName</label>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Loại đất -->
+                    <div class="entity-box col-12">
+                        <h5 class="entity-title">🧱 Loại đất phù hợp</h5>
+                        <div class="d-flex flex-wrap gap-3">
+                            @foreach (SoilType soil in Model.SoilTypes)
+                            {
+                                var soilList = Model.Plant.Soils?.OfType<SoilType>().ToList();
+                                bool isChecked = soilList != null && soilList.Any(s => s.Id == soil.Id);
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="SelectedSoilIds"
+                                           value="@soil.Id" @(isChecked ? "checked" : "") />
+                                    <label class="form-check-label">@soil.SoilName</label>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Loại cây -->
+                    <div class="entity-box col-12">
+                        <h5 class="entity-title">🌳 Loại cây</h5>
+                        <div class="d-flex flex-wrap gap-3">
+                            @foreach (PlantType type in Model.Categories)
+                            {
+                                var typeList = Model.Plant.Types?.OfType<PlantType>().ToList();
+                                bool isChecked = typeList != null && typeList.Any(t => t.Id == type.Id);
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="SelectedTypeIds"
+                                           value="@type.Id" @(isChecked ? "checked" : "") />
+                                    <label class="form-check-label">@type.TypeName</label>
+                                </div>
+                            }
+                        </div>
+                    </div>
+
+                    <!-- Nút -->
+                    <div class="col-12 text-end">
+                    <input asp-for="Plant.Id" type="hidden" />
+                        <button type="submit" class="btn btn-success px-4">💾 Cập nhật</button>
+                        <a asp-page="/Admin/Plants" class="btn btn-outline-secondary ms-2">↩️ Quay lại</a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>

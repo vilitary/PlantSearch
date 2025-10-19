@@ -1,0 +1,230 @@
+@page "{id:int}"
+@model DetailModel
+@{
+    ViewData["Title"] = "Chi tiết cây trồng";
+}
+<link rel="stylesheet" href="~/css/PlantDetail.css?v1.1" />
+
+<div class="container plant-detail mt-4">
+    <h2>@Model.Plant?.PlantName</h2>
+    <div class="row">
+        <div class="col-md-6">
+            @foreach (var img in Model.ImageUrls)
+            {
+                <img src="@img" class="img-fluid mb-2" alt="@Model.Plant.PlantName" />
+            }
+        </div>
+        <div class="col-md-6">
+            <p><strong>Tên khoa học:</strong> @Model.Plant?.ScienceName</p>
+            <p><strong>Xuất xứ:</strong> @Model.Plant?.Origin</p>
+            <p><strong>Thời gian sinh trưởng:</strong> @Model.Plant?.GrowthDuration ngày</p>
+            <p><strong>Mô tả:</strong> @Model.Plant?.Description</p>
+            <p><strong>Loại cây:</strong> @string.Join(", ", Model.Plant?
+                                .Types.Select(t => t.TypeName) ??
+                                Enumerable.Empty<string>())</p>
+            <p><strong>Mùa trồng:</strong> @string.Join(", ", Model.Plant?.Seasons.Select(s => s.SeasonName) ??
+                                Enumerable.Empty<string>())</p>
+            <p><strong>Vùng phù hợp:</strong> @string.Join(", ", Model.Plant?.Regions.Select(r => r.RegionName) ??
+                                Enumerable.Empty<string>())</p>
+            <p><strong>Loại đất:</strong> @string.Join(", ", Model.Soils.Select(s => s.SoilName))</p>
+            <p><strong>Phân bón:</strong> @string.Join(", ", Model.Fertilizers.Select(f => f.TypeName))</p>
+
+            <button class="btn btn-outline-danger mt-3" data-bs-toggle="modal" data-bs-target="#diseaseModal">Bệnh cây
+                trồng</button>
+            <button class="btn btn-outline-primary mt-3 ms-2" data-bs-toggle="modal" data-bs-target="#careModal">Chăm
+                sóc cây trồng</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Bệnh cây trồng -->
+<div class="modal fade" id="diseaseModal" tabindex="-1" aria-labelledby="diseaseModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Bệnh cây trồng</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                @if (Model.DiseaseTreatments.Any())
+                {
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Bệnh</th>
+                                <th>Triệu chứng</th>
+                                <th>Nguyên nhân</th>
+                                <th>Điều trị</th>
+                                <th>Ghi chú</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var dt in Model.DiseaseTreatments)
+                            {
+                                <tr>
+                                    <td>@dt.Disease?.DiseaseName</td>
+                                    <td>@dt.Disease?.Symptoms</td>
+                                    <td>@dt.Disease?.Causes</td>
+                                    <td>@dt.TreatmentMethod</td>
+                                    <td>@dt.Notes</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <p>Không có thông tin bệnh hoặc cách điều trị cho cây này.</p>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal: Chăm sóc cây trồng -->
+<div class="modal fade" id="careModal" tabindex="-1" aria-labelledby="careModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Phương pháp chăm sóc</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                @if (Model.CultivationMethods.Any())
+                {
+                    <table class="table table-bordered">
+                        <thead>
+                            <tr>
+                                <th>Phương pháp</th>
+                                <th>Mô tả</th>
+                                <th>Ghi chú</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (Models.CultivationMethod method in Model.CultivationMethods)
+                            {
+                                <tr>
+                                    <td>@method.MethodName</td>
+                                    <td>@method.Description</td>
+                                    <td>@method.Notes</td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                }
+                else
+                {
+                    <p>Chưa có thông tin chăm sóc cho cây này.</p>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+<hr />
+
+<!-- ⭐ Phần đánh giá -->
+<div class="mt-5">
+    <h4 class="fw-bold text-warning mb-3">
+        <i class="bi bi-star-fill"></i> Đánh giá cây trồng
+    </h4>
+
+    @if (Model.RatingCount > 0)
+    {
+        <div class="d-flex align-items-center mb-3">
+            <div class="me-3">
+                @{
+                    double avg = Model.AverageRating;
+                }
+                @for (int i = 1; i <= 5; i++)
+                {
+                    if (i <= Math.Floor(avg))
+                    {
+                        // Sao đầy
+                        <i class="bi bi-star-fill text-warning fs-4"></i>
+                    }
+                    else if (i - avg <= 0.5 && i > avg)
+                    {
+                        // Sao nửa
+                        <i class="bi bi-star-half text-warning fs-4"></i>
+                    }
+                    else
+                    {
+                        // Sao rỗng
+                        <i class="bi bi-star text-secondary fs-4"></i>
+                    }
+                }
+
+            </div>
+            <div>
+                <strong class="fs-5">@Model.AverageRating.ToString("0.0")</strong> / 5
+                <span class="text-muted">(@Model.RatingCount lượt đánh giá)</span>
+            </div>
+        </div>
+    }
+    else
+    {
+        <p class="text-muted fst-italic">Chưa có đánh giá nào cho cây này.</p>
+    }
+</div>
+
+<hr class="my-4" />
+
+<!-- 💬 Phần bình luận -->
+<div class="mt-4">
+    <h4 class="fw-bold text-success mb-3">
+        <i class="bi bi-chat-dots-fill"></i> Bình luận
+    </h4>
+
+    @if (Model.Comments.Any())
+    {
+        <div class="list-group shadow-sm rounded-3">
+            @foreach (var c in Model.Comments)
+            {
+                <div class="list-group-item border-0 border-bottom py-3">
+                    <div class="d-flex align-items-start">
+                        <!-- Avatar (ngẫu nhiên) -->
+                        <div class="me-3">
+                            <img src="https://ui-avatars.com/api/?name=@(c.Account?.Username ?? "User")&background=random&size=48"
+                                class="rounded-circle shadow-sm" alt="avatar">
+                        </div>
+
+                        <!-- Nội dung -->
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between">
+                                <strong>@(c.Account?.Username ?? "Người dùng ẩn danh")</strong>
+                                <small class="text-muted">@c.CreatedAt.ToString("dd/MM/yyyy HH:mm")</small>
+                            </div>
+                            <p class="mt-2 mb-0">@c.Content</p>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p class="text-muted fst-italic">Chưa có bình luận nào cho cây này.</p>
+    }
+</div>
+<!-- Form thêm bình luận -->
+<div class="mt-4">
+    <h5 class="fw-bold text-primary mb-3">Đăng bình luận</h5>
+
+    @if (User.Identity?.IsAuthenticated ?? false)
+    {
+        <form method="post">
+            <div class="mb-3">
+                <textarea class="form-control" name="Content" rows="3" placeholder="Viết bình luận của bạn..."
+                          required></textarea>
+            </div>
+            <input type="hidden" name="PlantId" value="@Model.Plant?.Id" />
+            <button type="submit" class="btn btn-success">Gửi bình luận</button>
+        </form>
+    }
+    else
+    {
+        <p class="text-muted">Bạn cần <a href="/Identity/Account/Login">đăng nhập</a> để bình luận.</p>
+    }
+</div>
+    

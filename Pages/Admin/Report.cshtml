@@ -1,0 +1,143 @@
+@page "/Admin/Report"
+@model ReportModel
+@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Báo cáo thống kê cây trồng</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" />
+    <style>
+        canvas {
+            display: block;
+            margin: 0 auto;
+            max-width: 600px;
+            background-color: #f9f9f9;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            padding: 10px;
+        }
+
+        h2 {
+            font-weight: bold;
+            color: #2e7d32;
+        }
+
+        button.btn-success {
+            font-size: 16px;
+            padding: 10px 20px;
+            border-radius: 6px;
+        }
+    </style>
+
+</head>
+@inject Microsoft.AspNetCore.Antiforgery.IAntiforgery Antiforgery
+<input type="hidden" id="RequestVerificationToken" name="__RequestVerificationToken"
+    value="@Antiforgery.GetTokens(HttpContext).RequestToken" />
+
+<body>
+    <div class="container mt-4">
+        <h2 class="text-center">📊 Báo cáo thống kê cây trồng</h2>
+
+        <canvas id="plantChart" height="100" class="mt-4"></canvas>
+        <canvas id="typeChart" height="100" class="mt-5"></canvas>
+
+        <div class="text-center mt-4">
+            <button id="downloadReportBtn" class="btn btn-success">📥 Xuất báo cáo PDF</button>
+        </div>
+        <input type="hidden" id="RequestVerificationToken" name="__RequestVerificationToken"
+            value="@Antiforgery.GetTokens(HttpContext).RequestToken" />
+    </div>
+    <script>
+        window.addEventListener('DOMContentLoaded', () => {
+            const monthLabels = @Html.Raw(Json.Serialize(Model.MonthLabels));
+            const monthCounts = @Html.Raw(Json.Serialize(Model.MonthlyPlantCounts));
+            const typeLabels = @Html.Raw(Json.Serialize(Model.TypeLabels));
+            const typeCounts = @Html.Raw(Json.Serialize(Model.TypeCounts));
+
+            const plantChartCanvas = document.getElementById('plantChart');
+            const typeChartCanvas = document.getElementById('typeChart');
+
+            const plantChart = new Chart(plantChartCanvas, {
+                type: 'bar',
+                data: {
+                    labels: monthLabels,
+                    datasets: [{
+                        label: 'Số cây trồng',
+                        data: monthCounts,
+                        backgroundColor: '#66bb6a',
+                        borderRadius: 5
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                stepSize: 1
+                            }
+                        }
+                    }
+                }
+            });
+
+            const typeChart = new Chart(typeChartCanvas, {
+                type: 'doughnut',
+                data: {
+                    labels: typeLabels,
+                    datasets: [{
+                        label: 'Loại cây',
+                        data: typeCounts,
+                        backgroundColor: ['#81c784', '#4db6ac', '#9575cd', '#ffb74d', '#e57373']
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+
+            document.getElementById('downloadReportBtn').addEventListener('click', () => {
+                setTimeout(async () => {
+                    const chartMonthImage = plantChartCanvas.toDataURL('image/png');
+                    const chartTypeImage = typeChartCanvas.toDataURL('image/png');
+                    const formData = new FormData();
+                    formData.append('ChartMonthImage', chartMonthImage);
+                    formData.append('ChartTypeImage', chartTypeImage);
+
+                    // ✅ Thêm Anti-Forgery Token vào FormData
+                    const token = document.getElementById('RequestVerificationToken').value;
+                    formData.append('__RequestVerificationToken', token);
+
+                    const response = await fetch('/Admin/Report', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const blob = await response.blob();
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'ThongKeCayTrong.pdf';
+                    a.click();
+                    URL.revokeObjectURL(url);
+                }, 500);
+            });
+
+        });
+    </script>
+
+
+</body>
+
+</html>

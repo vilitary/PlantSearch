@@ -1,0 +1,176 @@
+@page
+@model PlantsModel
+@{
+    Layout = "~/Pages/Shared/_Adminlayout.cshtml";
+    ViewData["Title"] = "Quản lý cây trồng";
+}
+<script src="https://cdn.jsdelivr.net/npm/@@popperjs/core@2.11.8/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@@eonasdan/tempus-dominus@6.7.0/dist/js/tempus-dominus.min.js"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" />
+<link rel="stylesheet"
+    href="https://cdn.jsdelivr.net/npm/@@eonasdan/tempus-dominus@6.7.0/dist/css/tempus-dominus.min.css" />
+<div class="container mt-4">
+    <h3 class="mb-4">🌿 Quản lý cây trồng</h3>
+
+    <!-- Form tìm kiếm -->
+    <form method="get" class="row g-3 mb-4">
+        <div class="col-md-3">
+            <input type="text" name="SearchName" value="@Model.SearchName" class="form-control"
+                placeholder="Tìm tên cây..." />
+        </div>
+
+        <div class="col-md-2">
+            <select name="SoilTypeId" class="form-select">
+                <option value="">Chọn đất</option>
+                @foreach (var soil in Model.SoilTypes)
+                {
+                    if (soil.Id == Model.SoilTypeId)
+                    {
+                        <option value="@soil.Id" selected>@soil.SoilName</option>
+                    }
+                    else
+                    {
+                        <option value="@soil.Id">@soil.SoilName</option>
+                    }
+                }
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <select name="SeasonId" class="form-select">
+                <option value="">Chọn mùa</option>
+                @foreach (var season in Model.Seasons)
+                {
+                    if (season.Id == Model.SeasonId)
+                    {
+                        <option value="@season.Id" selected>@season.SeasonName</option>
+                    }
+                    else
+                    {
+                        <option value="@season.Id">@season.SeasonName</option>
+                    }
+                }
+            </select>
+        </div>
+
+        <div class="col-md-2">
+            <select name="RegionId" class="form-select">
+                <option value="">Chọn vùng</option>
+                @foreach (var region in Model.Regions)
+                {
+                    if (region.Id == Model.RegionId)
+                    {
+                        <option value="@region.Id" selected>@region.RegionName</option>
+                    }
+                    else
+                    {
+                        <option value="@region.Id">@region.RegionName</option>
+                    }
+                }
+            </select>
+
+        </div>
+
+        <div class="col-md-2">
+            <select name="CategoriesId" class="form-select">
+                <option value="">Chọn loại cây</option>
+                @foreach (Models.PlantType cat in Model.Categories)
+                {
+                    if (cat.Id == Model.CategoriesId)
+                    {
+                        <option value="@cat.Id" selected>@cat.TypeName</option>
+                    }
+                    else
+                    {
+                        <option value="@cat.Id">@cat.TypeName</option>
+                    }
+                }
+            </select>
+
+        </div>
+        <div class="col-md-2">
+            <div class="input-group" id="datepicker" data-td-target-input="nearest" data-td-target-toggle="nearest">
+                <input type="text" name="CreatedDate" value="@Model.CreatedDate?.ToString("dd/MM/yyyy")"
+                    class="form-control" data-td-target="#datepicker" placeholder="Ngày tạo" />
+                <span class="input-group-text" data-td-toggle="datetimepicker" data-td-target="#datepicker">
+                    <i class="bi bi-calendar"></i>
+                </span>
+            </div>
+        </div>
+
+
+
+        <div class="col-md-1">
+            <button type="submit" class="btn btn-primary w-100">Tìm</button>
+        </div>
+    </form>
+    @section Scripts {
+        <script>
+            window.addEventListener('DOMContentLoaded', () => {
+                const datePickerEl = document.getElementById('datePicker');
+                const td = new tempusDominus.TempusDominus(datePickerEl, {
+                    display: {
+                        components: { decades: false, year: true, month: true, date: true, hours: false, minutes: false, seconds: false },
+                        buttons: { today: false, clear: true, close: true },
+                        placement: 'bottom'
+                    },
+                    localization: { format: 'dd/MM/yyyy', locale: 'vi' }
+                });
+
+            });
+        </script>
+    }
+    <div class="mb-4 text-end">
+        <a asp-page="/Admin/AddPlant" class="btn btn-success">
+            <i class="fas fa-plus-circle"></i> Thêm mới cây
+        </a>
+    </div>
+
+    <!-- Bảng cây trồng -->
+    <table class="table table-bordered table-hover align-middle">
+        <thead class="table-success">
+            <tr>
+                <th>Ảnh</th>
+                <th>Tên cây</th>
+                <th>Ngày tạo</th>
+                <th>Ngày cập nhật</th>
+                <th>Thao tác</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var plant in Model.Plants)
+            {
+                <tr>
+                    <td style="width: 120px;">
+                        <img src="@plant.ImageUrl" class="img-thumbnail"
+                            style="height: 80px; width: 100px; object-fit: cover;" />
+
+                    </td>
+                    <td>@plant.PlantName</td>
+                    <td>@plant.CreatedAt?.ToString("dd/MM/yyyy")</td>
+                    <td>@plant.UpdatedAt?.ToString("dd/MM/yyyy")</td>
+                    <td>
+                        <a asp-page="/Admin/EditPlant" asp-route-id="@plant.Id" class="btn btn-sm btn-warning me-2">
+                            <i class="fas fa-edit"></i> Sửa
+                        </a>
+                        <form method="post" asp-page-handler="Delete" asp-route-id="@plant.Id" class="d-inline">
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Xóa cây này?')">
+                                <i class="fas fa-trash-alt"></i> Xóa
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
+<nav>
+    <ul class="pagination justify-content-center">
+        @for (int i = 1; i <= Model.TotalPages; i++)
+        {
+            <li class="page-item @(i == Model.PageNumber ? "active" : "")">
+                <a class="page-link" asp-route-PageNumber="@i">@i</a>
+            </li>
+        }
+    </ul>
+</nav>

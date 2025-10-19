@@ -1,0 +1,129 @@
+@page
+@model AddPlantModel
+@{
+    ViewData["Title"] = "Thêm cây mới";
+    Layout = "~/Pages/Shared/_Adminlayout.cshtml";
+}
+<link rel="stylesheet" href="~/css/Addplant.css" />
+
+<h2>Thêm cây mới</h2>
+
+<form method="post">
+    <div>
+        <label>Tên cây:</label>
+        <input asp-for="Plant.PlantName" />
+    </div>
+    <div>
+        <label>Tên khoa học:</label>
+        <input asp-for="Plant.ScienceName" />
+    </div>
+    <div>
+        <label>Xuất xứ:</label>
+        <input asp-for="Plant.Origin" />
+    </div>
+    <div>
+        <label>Thời gian sinh trưởng:</label>
+        <input asp-for="Plant.GrowthDuration" type="number" />
+    </div>
+    <div>
+        <label>Mô tả:</label>
+        <textarea asp-for="Plant.Description"></textarea>
+    </div>
+    <div>
+        <label>Ảnh:</label>
+        <input asp-for="NewImageUrl" />
+    </div>
+
+    <div>
+        <label>Loại đất:</label>
+        <div class="checkbox-group">
+            @foreach (var soil in Model.SoilTypes)
+            {
+                <label>
+                    <input type="checkbox" name="SelectedSoilIds" value="@soil.Id" />
+                    @soil.SoilName
+                </label>
+            }
+        </div>
+    </div>
+
+    <div>
+        <label>Mùa vụ:</label>
+        <div class="checkbox-group">
+            @foreach (var season in Model.Seasons)
+            {
+                <label>
+                    <input type="checkbox" name="SelectedSeasonIds" value="@season.Id" />
+                    @season.SeasonName (@season.StartMonth - @season.EndMonth)
+                </label>
+            }
+        </div>
+    </div>
+
+    <div>
+        <label>Phân bón:</label>
+        <div class="checkbox-group">
+            @foreach (var fert in Model.AllFertilizers)
+            {
+                <label>
+                    <input type="checkbox" name="SelectedFertilizerIds" value="@fert.Id" />
+                    @fert.TypeName
+                </label>
+            }
+        </div>
+    </div>
+
+    <div>
+        <label>Bệnh:</label>
+        <div class="checkbox-group">
+            @foreach (var dis in Model.AllDiseases)
+            {
+                <label>
+                    <input type="checkbox" name="SelectedDiseaseIds" value="@dis.Id" />
+                    @dis.DiseaseName
+                </label>
+            }
+        </div>
+    </div>
+
+    <div>
+        <label>Vùng trồng:</label>
+        <div class="checkbox-group">
+            @foreach (var reg in Model.Regions)
+            {
+                <label>
+                    <input type="checkbox" name="SelectedRegionIds" value="@reg.Id" />
+                    @reg.RegionName
+                </label>
+            }
+        </div>
+    </div>
+
+    <div>
+        <label>Phương pháp canh tác:</label>
+        <div class="checkbox-group">
+            @foreach (var method in Model.AllMethods)
+            {
+                <label>
+                    <input type="checkbox" name="SelectedMethodIds" value="@method.Id" />
+                    @method.MethodName
+                </label>
+            }
+        </div>
+    </div>
+
+    <div>
+        <label>Loại cây:</label>
+        <div class="checkbox-group">
+            @foreach (var type in Model.Categories)
+            {
+                <label>
+                    <input type="checkbox" name="SelectedTypeIds" value="@type.Id" />
+                    @type.TypeName
+                </label>
+            }
+        </div>
+    </div>
+
+    <button type="submit">Thêm cây</button>
+</form>

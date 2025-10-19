@@ -1,0 +1,133 @@
+@page
+@model ViewModel
+@using PlantSearch.Models
+@{
+    ViewData["Title"] = "Danh sách cây trồng";
+}
+<link rel="stylesheet" href="~/css/ViewPlant.css" />
+
+<div class="container mt-4">
+    <div class="row">
+        <!-- Sidebar: Loại cây -->
+        <div class="col-md-3">
+            <h5>Loại cây</h5>
+            <ul class="list-group">
+                <li class="list-group-item @(Model.TypeId == null ? "active" : "")">
+                    <a asp-page="./View">Tất cả</a>
+                </li>
+                @foreach (PlantType type in Model.PlantTypes)
+                {
+                    <li class="list-group-item @(Model.TypeId == type.Id ? "active" : "")">
+                        <a asp-page="./View" asp-route-typeId="@type.Id">@type.TypeName</a>
+                    </li>
+                }
+            </ul>
+        </div>
+
+        <!-- Main content: Danh sách cây -->
+        <div class="col-md-9">
+            <form method="get" class="row g-3 mb-4">
+                <div class="col-md-3">
+                    <input type="text" name="SearchName" value="@Model.SearchName" class="form-control"
+                        placeholder="Tìm tên cây..." />
+                </div>
+                <div class="col-md-2">
+                    <select name="TypeId" class="form-select">
+                        <option value="">Loại cây</option>
+                        @foreach (PlantType type in Model.PlantTypes)
+                        {
+                            if (type.Id == Model.TypeId)
+                            {
+                                <option value="@type.Id" selected>@type.TypeName</option>
+                            }
+                            else
+                            {
+                                <option value="@type.Id">@type.TypeName</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="SeasonId" class="form-select">
+                        <option value="">Mùa trồng</option>
+                        @foreach (Season season in Model.Seasons)
+                        {
+                            if (season.Id == Model.SeasonId)
+                            {
+                                <option value="@season.Id" selected>@season.SeasonName</option>
+                            }
+                            else
+                            {
+                                <option value="@season.Id">@season.SeasonName</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <select name="RegionId" class="form-select">
+                        <option value="">Vùng phù hợp</option>
+                        @foreach (SuitableRegion region in Model.Regions)
+                        {
+                            if (region.Id == Model.RegionId)
+                            {
+                                <option value="@region.Id" selected>@region.RegionName</option>
+                            }
+                            else
+                            {
+                                <option value="@region.Id">@region.RegionName</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit"
+                        class="btn btn-success w-100 rounded-pill d-flex align-items-center justify-content-center gap-2">
+                        <i class="fas fa-search"></i> Tìm kiếm
+                    </button>
+                    
+                </div>
+            </form>
+
+            <h3>Danh sách cây trồng</h3>
+            <div class="row">
+                @foreach (PlantViewModel item in Model.Plants)
+                {
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <a asp-page="./PlantDetail" asp-route-id="@item.Plant.Id">
+                                <img src="@item.ImageUrl" class="card-img-top" alt="@item.Plant.PlantName" />
+                                
+                            </a>
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title">
+                                    <a asp-page="./PlantDetail" asp-route-id="@item.Plant.Id">@item.Plant.PlantName</a>
+                                </h5>
+                                <p class="card-text"><strong>Tên khoa học:</strong> @item.Plant.ScienceName</p>
+                                <p class="card-text"><strong>Xuất xứ:</strong> @item.Plant.Origin</p>
+                                <a asp-page="./PlantDetail" asp-route-id="@item.Plant.Id"
+                                    class="btn btn-sm btn-outline-success mt-auto">Xem thêm</a>
+                            </div>
+
+                        </div>
+                    </div>
+                }
+
+            </div>
+        </div>
+    </div>
+</div>
+<nav aria-label="Phân trang cây trồng">
+    <ul class="pagination justify-content-center">
+        @for (int i = 1; i <= Model.TotalPages; i++)
+        {
+            <li class="page-item @(Model.PageNumber == i ? "active" : "")">
+                <a class="page-link" asp-page="./View" asp-route-PageNumber="@i" asp-route-TypeId="@Model.TypeId"
+                    asp-route-SeasonId="@Model.SeasonId" asp-route-RegionId="@Model.RegionId"
+                    asp-route-SearchName="@Model.SearchName">
+                    @i
+                </a>
+
+            </li>
+        }
+    </ul>
+</nav>

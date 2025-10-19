@@ -1,0 +1,76 @@
+/* plant-detail.css */
+
+/* Áp dụng cho phần chi tiết cây trồng */
+.plant-detail {
+    background-color: #f4f9f4;
+    font-family: 'Segoe UI', sans-serif;
+    color: #2f4f2f;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 128, 0, 0.1);
+}
+
+.plant-detail h2 {
+    font-size: 2rem;
+    font-weight: bold;
+    color: #228B22;
+    margin-bottom: 1rem;
+    border-bottom: 2px solid #cdeac0;
+    padding-bottom: 0.5rem;
+}
+
+.plant-detail img {
+    border-radius: 8px;
+    border: 2px solid #cdeac0;
+    max-height: 300px;
+    object-fit: cover;
+}
+
+.plant-detail p {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.plant-detail p strong {
+    color: #006400;
+}
+
+.plant-detail .btn {
+    font-weight: bold;
+    padding: 0.5rem 1rem;
+    border-radius: 20px;
+}
+
+/* Modal bên trong chi tiết cây */
+.plant-detail .modal-header {
+    background-color: #e6ffe6;
+    border-bottom: 1px solid #b2d8b2;
+}
+
+.plant-detail .modal-title {
+    color: #228B22;
+    font-weight: bold;
+}
+
+.plant-detail .table-bordered {
+    border: 1px solid #cdeac0;
+}
+
+.plant-detail .table-bordered th {
+    background-color: #f0fff0;
+    color: #006400;
+    font-weight: 600;
+}
+
+.plant-detail .table-bordered td {
+    background-color: #ffffff;
+    color: #2f4f2f;
+}
+
+.plant-detail .table-bordered tr:hover td {
+    background-color: #f5fff5;
+}
+.list-group-item {
+    border-radius: 8px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+}

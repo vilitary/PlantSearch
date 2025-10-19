@@ -1,0 +1,95 @@
+body {
+    background-color: #f0f8f5;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.container-dashboard {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.cards-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    display: flex;
+    flex-direction: column;
+}
+
+.card h4 {
+    margin-bottom: 15px;
+    text-align: center;
+    color: #2e7d32;
+    font-weight: 600;
+}
+
+.table-topplants {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.table-topplants th,
+.table-topplants td {
+    padding: 6px 10px;
+    border: 1px solid #e0e0e0;
+    text-align: center;
+}
+
+.table-topplants th {
+    background-color: #c8e6c9;
+    color: #1b5e20;
+}
+
+.table-topplants td i {
+    margin: 0 1px;
+}
+
+.chart-container {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.action-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.action-buttons a {
+    padding: 12px 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 10px;
+    text-decoration: none;
+    color: #fff;
+    transition: background 0.3s ease;
+}
+
+.btn-manage {
+    background-color: #43a047;
+}
+
+.btn-manage:hover {
+    background-color: #2e7d32;
+}
+
+.btn-report {
+    background-color: #6d4c41;
+}
+
+.btn-report:hover {
+    background-color: #5d4037;
+}
